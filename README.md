@@ -1,0 +1,2 @@
+# SC-PickingObjects
+ Suppose a world where there are two types of things: ants and wood sticks. The ants may wonder in the world randomly. When they find a wood stick in their neighborhood they pick it, if they are not carrying already one, and continue their random walk. If they encounter a pile of wood sticks while carrying one they deposit it in the pile and, again, proceed with their random walk.

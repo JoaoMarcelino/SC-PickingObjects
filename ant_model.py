@@ -20,10 +20,11 @@ class StickAgent(Agent):
 class AntAgent(Agent):
     """An agent that walks randomly in the grid looking for a stick with the objective to make a pile."""
 
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, stick_min):
         super().__init__(unique_id, model)
         self.stick = None
         self.name = "Ant"
+        self.stick_min = stick_min
 
     def step(self):
 
@@ -40,17 +41,18 @@ class AntAgent(Agent):
     def place(self):
         """Verify if the place on the grid """
 
-        if self.stick != None:
-            
-            cellmates = self.model.grid.get_cell_list_contents([self.pos])
-            sticks = [agent for agent in cellmates if agent.name == "Stick"]
-            sticks = [stick for stick in sticks if stick.ant == None]
+        if self.stick == None:
+            return
 
-            if sticks:
-                #logging.info(f"Found Stick Pile. Dropping {self.stick.unique_id} in {self.pos}")
-                self.stick.ant = None
-                self.stick = None
-                
+        cellmates = self.model.grid.get_cell_list_contents([self.pos])
+        sticks = [agent for agent in cellmates if agent.name == "Stick"]
+        free_sticks = [stick for stick in sticks if stick.ant == None]
+
+        if free_sticks and len(free_sticks) >= self.stick_min:
+            #print(f"Found Stick Pile. Dropping {self.stick.unique_id} in {self.pos}")
+            self.stick.ant = None
+            self.stick = None
+            
     
     def move(self):
         
@@ -81,6 +83,9 @@ class AntAgent(Agent):
         
 
     def grab(self):
+
+        if self.stick != None:
+            return
         
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         sticks = [agent for agent in cellmates if agent.name == "Stick"]
@@ -91,16 +96,17 @@ class AntAgent(Agent):
             stick = self.random.choice(free_sticks)
             stick.ant = self
             self.stick = stick
-            #logging.info(f"Ant {self.unique_id} - Found Stick. Grabbing {self.stick.unique_id} in {self.pos}")
+            #print(f"Ant {self.unique_id} - Found Stick. Grabbing {self.stick.unique_id} in {self.pos}")
 
 class AntModel(Model):
     """A model with 2 type of agents."""
 
-    def __init__(self, num_ants, num_sticks, neighType, width, height):
+    def __init__(self, num_ants, num_sticks, neighType, stick_min, width, height):
 
         self.num_ants = num_ants
         self.num_sticks = num_sticks
         self.neighType = neighType
+        self.stick_min = stick_min
 
         self.grid = MultiGrid(width, height, True)
         self.schedule = RandomActivation(self)
@@ -109,7 +115,7 @@ class AntModel(Model):
 
         # Create ants
         for i in range(self.num_ants):
-            ant = AntAgent(i, self)
+            ant = AntAgent(i, self, self.stick_min)
             self.schedule.add(ant)
 
             # Add the agent to a random grid cell

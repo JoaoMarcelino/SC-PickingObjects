@@ -16,6 +16,15 @@ class StickAgent(Agent):
         super().__init__(unique_id, model)
         self.name = "Stick"
         self.ant = None
+        self.num_neighbors = 0
+
+    #CHANGES 
+    def step(self):
+        cellmates = self.model.grid.get_cell_list_contents([self.pos])
+        sticks = [agent for agent in cellmates if agent.name == "Stick"]
+
+        self.num_neighbors = len(sticks)
+
 
 class AntAgent(Agent):
     """An agent that walks randomly in the grid looking for a stick with the objective to make a pile."""
@@ -109,14 +118,16 @@ class AntModel(Model):
         self.stick_min = stick_min
 
         self.grid = MultiGrid(width, height, True)
-        self.schedule = RandomActivation(self)
+
+        self.schedule_ants = RandomActivation(self)
+        self.schedule_sticks = RandomActivation(self)
 
         self.running = True
 
         # Create ants
         for i in range(self.num_ants):
             ant = AntAgent(i, self, self.stick_min)
-            self.schedule.add(ant)
+            self.schedule_ants.add(ant)
 
             # Add the agent to a random grid cell
             x = self.random.randrange(self.grid.width)
@@ -131,6 +142,9 @@ class AntModel(Model):
         for i in range(self.num_sticks):
             stick = StickAgent(i, self)
 
+            #CHANGES
+            self.schedule_sticks.add(stick)
+            
             # Add the agent to a random grid cell
             x = self.random.randrange(self.grid.width)
             y = self.random.randrange(self.grid.height)
@@ -140,4 +154,7 @@ class AntModel(Model):
     def step(self):
         """Advance the model by one step."""
         #self.datacollector.collect(self)
-        self.schedule.step()
+        self.schedule_ants.step()
+
+        #CHANGES 
+        self.schedule_sticks.step()

@@ -66,8 +66,8 @@ def agent_portrayal(agent):
 
 if __name__ == "__main__":
     
-    width = 10
-    height = 10
+    width = 50
+    height = 50
 
     # Moore, Van Neumann, Inverse Van Neumann
     neigh = ["M", "VN", "IVN"]
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     server = ModularServer(AntModel,
                         [grid],
                         "Ant Model",
-                        {"num_ants":1, "num_sticks":50, "neighType":neigh[0], "stick_min": 2, "width":width, "height":height})  
+                        {"num_ants":10, "num_sticks":1000, "neighType":neigh[0], "stick_min": 1, "width":width, "height":height})  
                         
     server.port = 8521 # The default
     server.launch()

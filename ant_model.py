@@ -9,6 +9,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+def average_stick_pile(model):
+    stick_piles = [agent.num_neighbors for agent in model.schedule.agents]
+    N = model.num_sticks
+    return sum(stick_piles) / N
+
 
 class StickAgent(Agent):
     """An still agent that only moves when picked up."""
@@ -120,7 +125,7 @@ class AntModel(Model):
         self.grid = MultiGrid(width, height, True)
 
         self.schedule_ants = RandomActivation(self)
-        self.schedule_sticks = RandomActivation(self)
+        self.schedule = RandomActivation(self)
 
         self.running = True
 
@@ -134,16 +139,16 @@ class AntModel(Model):
             y = self.random.randrange(self.grid.height)
             self.grid.place_agent(ant, (x, y))
 
-            #self.datacollector = DataCollector(
-            #    model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
-            #)
+            self.datacollector = DataCollector(
+                model_reporters={"Average": average_stick_pile}, agent_reporters={"Sticks": 'num_neighbors'}
+            )
         
         # Create sticks
         for i in range(self.num_sticks):
             stick = StickAgent(i, self)
 
             #CHANGES
-            self.schedule_sticks.add(stick)
+            self.schedule.add(stick)
             
             # Add the agent to a random grid cell
             x = self.random.randrange(self.grid.width)
@@ -153,8 +158,9 @@ class AntModel(Model):
 
     def step(self):
         """Advance the model by one step."""
-        #self.datacollector.collect(self)
         self.schedule_ants.step()
 
         #CHANGES 
-        self.schedule_sticks.step()
+        self.schedule.step()
+
+        self.datacollector.collect(self)

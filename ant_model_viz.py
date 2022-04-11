@@ -74,14 +74,14 @@ if __name__ == "__main__":
 
     grid = CanvasGrid_Altered(agent_portrayal, width, height, 500, 500)
 
-    #chart = ChartModule([{"Label": "Gini",
-    #                    "Color": "Black"}],
-    #                    data_collector_name='datacollector')
+    chart = ChartModule([{"Label": "Average",
+                        "Color": "Black"}],
+                        data_collector_name='datacollector')
 
     server = ModularServer(AntModel,
-                        [grid],
+                        [grid, chart],
                         "Ant Model",
-                        {"num_ants":10, "num_sticks":1000, "neighType":neigh[0], "stick_min": 1, "width":width, "height":height})  
+                        {"num_ants":100, "num_sticks":1000, "neighType":neigh[0], "stick_min": 2, "width":width, "height":height})  
                         
-    server.port = 8521 # The default
+    server.port = 8522 # The default
     server.launch()

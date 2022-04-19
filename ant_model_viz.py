@@ -66,13 +66,13 @@ def agent_portrayal(agent):
 
 if __name__ == "__main__":
     
-    width = 50
-    height = 50
+    width = 100
+    height = 100
 
     # Moore, Van Neumann, Inverse Van Neumann
     neigh = ["M", "VN", "IVN"]
 
-    grid = CanvasGrid_Altered(agent_portrayal, width, height, 500, 500)
+    grid = CanvasGrid_Altered(agent_portrayal, width, height)
 
     chart = ChartModule([{"Label": "Average",
                         "Color": "Black"}],
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     server = ModularServer(AntModel,
                         [grid, chart],
                         "Ant Model",
-                        {"num_ants":100, "num_sticks":1000, "neighType":neigh[0], "stick_min": 2, "width":width, "height":height})  
+                        {"num_ants":100, "num_sticks":1000, "neighType":neigh[0], "stick_min": 2, "stick_max": None, "width":width, "height":height})  
                         
     server.port = 8522 # The default
     server.launch()

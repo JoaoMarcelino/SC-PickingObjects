@@ -8,6 +8,7 @@ from mesa.batchrunner import batch_run
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import math
 
 def average_stick_pile(model):
     stick_piles = [agent.num_neighbors for agent in model.schedule.agents]
@@ -34,11 +35,12 @@ class StickAgent(Agent):
 class AntAgent(Agent):
     """An agent that walks randomly in the grid looking for a stick with the objective to make a pile."""
 
-    def __init__(self, unique_id, model, stick_min):
+    def __init__(self, unique_id, model, stick_min, stick_max):
         super().__init__(unique_id, model)
         self.stick = None
         self.name = "Ant"
         self.stick_min = stick_min
+        self.stick_max = stick_max
 
     def step(self):
 
@@ -62,7 +64,7 @@ class AntAgent(Agent):
         sticks = [agent for agent in cellmates if agent.name == "Stick"]
         free_sticks = [stick for stick in sticks if stick.ant == None]
 
-        if free_sticks and len(free_sticks) >= self.stick_min:
+        if len(free_sticks) >= self.stick_min and len(free_sticks) <= self.stick_max:
             #print(f"Found Stick Pile. Dropping {self.stick.unique_id} in {self.pos}")
             self.stick.ant = None
             self.stick = None
@@ -115,12 +117,16 @@ class AntAgent(Agent):
 class AntModel(Model):
     """A model with 2 type of agents."""
 
-    def __init__(self, num_ants, num_sticks, neighType, stick_min, width, height):
+    def __init__(self, num_ants, num_sticks, neighType, stick_min, stick_max,  width, height):
+
+        if stick_max == None:
+            stick_max = math.inf
 
         self.num_ants = num_ants
         self.num_sticks = num_sticks
         self.neighType = neighType
         self.stick_min = stick_min
+        self.stick_max = stick_max
 
         self.grid = MultiGrid(width, height, True)
 
@@ -131,7 +137,7 @@ class AntModel(Model):
 
         # Create ants
         for i in range(self.num_ants):
-            ant = AntAgent(i, self, self.stick_min)
+            ant = AntAgent(i, self, self.stick_min, stick_max)
             self.schedule_ants.add(ant)
 
             # Add the agent to a random grid cell

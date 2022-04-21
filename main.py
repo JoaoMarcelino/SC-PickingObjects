@@ -1,44 +1,52 @@
-from ant_model import AntModel
+from ant_model import AntModel, average_stick_pile
 import random
+import os
+from mesa.batchrunner import batch_run
+import pandas as pd
 
 
 def main():
 
-    n_ants = [1, 10, 100]
-    n_sticks = [50, 500, 1000]
-    neigh = ["VN","M"]
-    stick_min = [1, 2, 4]
-    stick_max = [None, 5, 10]
+    n_ants = [1] + [a for a in range(10, 110, 10)] 
+    n_sticks = [a for a in range(50, 550, 50)] 
+    neigh = ["VN","M", "IVN"]
+    stick_min = [a for a in range(1,11)]
+    stick_max = [a for a in range(0,11)]
     width = 10
     height = 10
     num_gens = 2000
-    seed_num = 30
+    seed = 30
 
     path = "./SC-PickingObjects/results/"
-    for seed in range(seed_num):
-        for ants in n_ants:
-            for sticks in n_sticks:
-                for neig in neigh:
-                    for min in stick_min:
-                        for max in stick_max:
 
-                            random.seed(seed)
+    params = {
+        "num_ants": n_ants,
+        "num_sticks":n_sticks,
+        "neighType":neigh,
+        "stick_min":stick_min,
+        "stick_max":stick_max,
+        "width":width,
+        "height":height
+        }
 
-                            model = AntModel(ants, sticks, neig, min, max, width, height)
+    results = batch_run(
+    AntModel,
+    parameters=params,
+    iterations=seed,
+    max_steps=num_gens,
+    number_processes=None,
+    data_collection_period=50,
+    display_progress=True,
+    )
 
+    results_df = pd.DataFrame(results)
 
-                            for i in range(num_gens):
-                                model.step()
-                            
-                            average_df = model.datacollector.get_model_vars_dataframe()
-                            sticks_df = model.datacollector.get_agent_vars_dataframe()
-                            
-
-                            average = f"average/{ants}_{sticks}_{neig}_{min}_{max}_{num_gens}_{seed}"
-                            stick = f"sticks/{ants}_{sticks}_{neig}_{min}_{max}_{num_gens}_{seed}"
-                            
-                            average_df.to_csv(path + average)
-                            sticks_df.to_csv(path + stick)
+    total = f"batch_1.csv"
+    
+    results_df.to_csv(path + total)
+                        
+                        
+                        
 
 
 

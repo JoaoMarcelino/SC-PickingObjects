@@ -85,6 +85,20 @@ class AntAgent(Agent):
                 moore=False,
                 include_center=False)
 
+        elif (self.model.neighType == "IVN"):
+            moore= self.model.grid.get_neighborhood(
+                self.pos,
+                moore=True,
+                include_center=False)
+            
+            vn = self.model.grid.get_neighborhood(
+                self.pos,
+                moore=False,
+                include_center=False)
+
+            possible_steps = list(set(moore) - set(vn))
+
+
         #Choose Position and Move Ant and Stick
         previous_position = self.pos
         new_position = self.random.choice(possible_steps)
@@ -119,7 +133,7 @@ class AntModel(Model):
 
     def __init__(self, num_ants, num_sticks, neighType, stick_min, stick_max,  width, height):
 
-        if stick_max == None:
+        if stick_max == 0:
             stick_max = math.inf
 
         self.num_ants = num_ants

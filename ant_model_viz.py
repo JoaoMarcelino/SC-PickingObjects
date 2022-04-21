@@ -81,7 +81,7 @@ if __name__ == "__main__":
     server = ModularServer(AntModel,
                         [grid, chart],
                         "Ant Model",
-                        {"num_ants":100, "num_sticks":1000, "neighType":neigh[0], "stick_min": 2, "stick_max": None, "width":width, "height":height})  
+                        {"num_ants":100, "num_sticks":1000, "neighType":neigh[2], "stick_min": 2, "stick_max": None, "width":width, "height":height})  
                         
     server.port = 8522 # The default
     server.launch()

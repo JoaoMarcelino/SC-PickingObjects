@@ -66,8 +66,8 @@ def agent_portrayal(agent):
 
 if __name__ == "__main__":
     
-    width = 100
-    height = 100
+    width = 10
+    height = 10
 
     # Moore, Van Neumann, Inverse Van Neumann
     neigh = ["M", "VN", "IVN"]
@@ -77,11 +77,15 @@ if __name__ == "__main__":
     chart = ChartModule([{"Label": "Average",
                         "Color": "Black"}],
                         data_collector_name='datacollector')
+    
+    chart2 = ChartModule([{"Label": "Median",
+                        "Color": "Black"}],
+                        data_collector_name='datacollector')
 
     server = ModularServer(AntModel,
-                        [grid, chart],
+                        [grid, chart, chart2],
                         "Ant Model",
-                        {"num_ants":100, "num_sticks":1000, "neighType":neigh[2], "stick_min": 2, "stick_max": None, "width":width, "height":height})  
+                        {"num_ants":1, "num_sticks":50, "neighType":neigh[2], "stick_min": 2, "stick_max": 0, "width":width, "height":height})  
                         
     server.port = 8522 # The default
     server.launch()

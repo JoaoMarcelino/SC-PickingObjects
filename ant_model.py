@@ -9,11 +9,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import math
+import statistics
 
 def average_stick_pile(model):
-    stick_piles = [agent.num_neighbors for agent in model.schedule.agents]
+    stick_piles = [agent.num_cellmates for agent in model.schedule.agents]
     N = model.num_sticks
     return sum(stick_piles) / N
+
+def median_stick_pile(model):
+    stick_piles = [agent.num_cellmates for agent in model.schedule.agents]
+
+    return statistics.median(stick_piles)
+
 
 
 class StickAgent(Agent):
@@ -22,14 +29,14 @@ class StickAgent(Agent):
         super().__init__(unique_id, model)
         self.name = "Stick"
         self.ant = None
-        self.num_neighbors = 0
+        self.num_cellmates = 0
 
     #CHANGES 
     def step(self):
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         sticks = [agent for agent in cellmates if agent.name == "Stick"]
 
-        self.num_neighbors = len(sticks)
+        self.num_cellmates = len(sticks)
 
 
 class AntAgent(Agent):
@@ -160,7 +167,7 @@ class AntModel(Model):
             self.grid.place_agent(ant, (x, y))
 
             self.datacollector = DataCollector(
-                model_reporters={"Average": average_stick_pile}, agent_reporters={"Sticks": 'num_neighbors'}
+                model_reporters={"Average": average_stick_pile, "Median": median_stick_pile}, agent_reporters={"Sticks": 'num_cellmates'}
             )
         
         # Create sticks

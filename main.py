@@ -3,6 +3,8 @@ import random
 import os
 from mesa.batchrunner import batch_run
 import pandas as pd
+from os.path import exists
+
 
 
 def main():
@@ -25,7 +27,15 @@ def main():
             for neighbor in neigh:
                 for s_min in stick_min:
                     for s_max in stick_max:
+
+
                         if s_max == s_min:
+                            break
+                        
+                        total = f"batch_{ants}_{sticks}_{neighbor}_{s_min}_{s_max}.csv"
+                        path_to_file = path + total
+                        
+                        if exists(path_to_file):
                             break
 
                         params = {
@@ -49,10 +59,8 @@ def main():
                         )
 
                         results_df = pd.DataFrame(results)
-
-                        total = f"batch_{ants}_{sticks}_{neighbor}_{s_min}_{s_max}.csv"
                         
-                        results_df.to_csv(path + total)
+                        results_df.to_csv(path_to_file)
                                         
                         
 

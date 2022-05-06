@@ -7,6 +7,7 @@ from mesa.batchrunner import batch_run
 import pandas as pd
 from os.path import exists
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 import numpy as np
 
@@ -24,7 +25,7 @@ def main():
     num_gens = 1000
     seed = 30
 
-    path = "./SC-PickingObjects/results/"
+    path = "results/"
 
     for ants in n_ants:
         for sticks in n_sticks:
@@ -60,7 +61,7 @@ def main():
                         )
 
                         results_df = pd.DataFrame(results)
-                        
+                     
                         results_df.to_csv(path_to_file)
                                         
                         
@@ -80,7 +81,7 @@ def plotAnts(sticks):
     num_gens = 1000
     seed = 30
 
-    path = "./SC-PickingObjects/results/"
+    path = "results/"
 
     min = stick_min[0]
     max = stick_max[0]
@@ -134,7 +135,7 @@ def plotSticks(ants):
     num_gens = 1000
     seed = 30
 
-    path = "./SC-PickingObjects/results/"
+    path = "results/"
 
     min = stick_min[0]
     max = stick_max[0]
@@ -244,7 +245,7 @@ def plotStickMin(ants, sticks):
     num_gens = 1000
     seed = 30
 
-    path = "./SC-PickingObjects/results/"
+    path = "results/"
 
     n = neigh[0]
     max = stick_max[0]
@@ -298,7 +299,7 @@ def plotStickMax(ants, sticks):
     num_gens = 1000
     seed = 30
 
-    path = "./SC-PickingObjects/results/"
+    path = "results/"
 
     n = neigh[0]
     min = stick_min[0]
@@ -354,7 +355,7 @@ def heatmap_Average():
     num_gens = 1000
     seed = 30
 
-    path = "./SC-PickingObjects/results/"
+    path = "results/"
 
     heatmap_info = []
 
@@ -375,7 +376,7 @@ def heatmap_Average():
                 val = df[(df.Step == num_gens) & (df.AgentID == 0) & (df.iteration == j)].Average.values
 
 
-                average = np.sum([average, val], axis=0)
+                average = np.sum([average, val])
 
             average = average/seed
 
@@ -388,22 +389,12 @@ def heatmap_Average():
     #print(heatmap_info)
 
     fig, ax = plt.subplots()
-    im = ax.imshow(heatmap_info)
-
+    ax = sns.heatmap(heatmap_info,annot = True,fmt = "0.3f",cmap="coolwarm")
     # Show all ticks and label them with the respective list entries
     ax.set_yticks(np.arange(len(n_ants)), labels=n_ants)
     ax.set_xticks(np.arange(len(n_sticks)), labels=n_sticks)
-
-    # Rotate the tick labels and set their alignment.
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
-            rotation_mode="anchor")
-
-    # Loop over data dimensions and create text annotations.
-    for i in range(len(n_ants)):
-        for j in range(len(n_sticks)):
-            text = ax.text(j, i, heatmap_info[i, j],
-                        ha="center", va="center", color="w")
-
+    ax.set_xlabel("Sticks")
+    ax.set_ylabel("Ants")
     ax.set_title("Final Average of Sticks for x sticks and y ants")
     fig.tight_layout()
     plt.show()
@@ -423,8 +414,7 @@ def heatmap_Median():
     num_gens = 1000
     seed = 30
 
-    path = "./SC-PickingObjects/results/"
-
+    path = "results/"
     heatmap_info = []
 
     for i, ants in enumerate(n_ants):
@@ -443,38 +433,26 @@ def heatmap_Median():
 
                 val = df[(df.Step == num_gens) & (df.AgentID == 0) & (df.iteration == j)].Median.values
 
-                print(val, average)
+                #print(val, average)
 
-                average = np.sum([average, val], axis=0)
+                average = np.sum([average, val])
 
-            average = average/seed
-            
-
+            average = (average/seed)
             heatmap_line.append(average)
         #print(heatmap_line)
         heatmap_info.append(heatmap_line)
 
     heatmap_info = np.array(heatmap_info)
-
     #print(heatmap_info)
 
     fig, ax = plt.subplots()
-    im = ax.imshow(heatmap_info)
+    ax = sns.heatmap(heatmap_info,annot = True,fmt = "0.3f",cmap="YlGnBu")
 
     # Show all ticks and label them with the respective list entries
     ax.set_yticks(np.arange(len(n_ants)), labels=n_ants)
     ax.set_xticks(np.arange(len(n_sticks)), labels=n_sticks)
-
-    # Rotate the tick labels and set their alignment.
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
-            rotation_mode="anchor")
-
-    # Loop over data dimensions and create text annotations.
-    for i in range(len(n_ants)):
-        for j in range(len(n_sticks)):
-            text = ax.text(j, i, heatmap_info[i, j],
-                        ha="center", va="center", color="w")
-
+    ax.set_xlabel("Sticks")
+    ax.set_ylabel("Ants")
     ax.set_title("Final Median of Sticks for x sticks and y ants")
     fig.tight_layout()
     plt.show()
@@ -497,10 +475,10 @@ if __name__ == "__main__":
     ant = n_ants[1]
     sticks = n_sticks[-1]
 
-    plotNeigh(ant, sticks)
-    plotStickMin(ant, sticks)
-    plotStickMax(ant, sticks)
+    #plotNeigh(ant, sticks)
+    #plotStickMin(ant, sticks)
+    #plotStickMax(ant, sticks)
     
     
-    #heatmap_Average()
+    heatmap_Average()
     #heatmap_Median()

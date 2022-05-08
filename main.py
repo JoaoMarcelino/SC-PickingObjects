@@ -18,14 +18,14 @@ def main():
     n_ants = [1] + [a for a in range(10, 60, 10)] 
     n_sticks = [a for a in range(50, 300, 50)] 
     neigh = ["VN","M", "IVN"]
-    stick_min = [5]
-    stick_max = [10, 15, 0]
+    stick_min = [1, 2]
+    stick_max = [5, 10, 15]
     width = 10
     height = 10
     num_gens = 1000
     seed = 30
 
-    path = "results/"
+    path = "./results/"
 
     for ants in n_ants:
         for sticks in n_sticks:
@@ -37,8 +37,6 @@ def main():
                         total = f"batch_{ants}_{sticks}_{neighbor}_{s_min}_{s_max}.csv"
                         path_to_file = path + total
                         
-                        if exists(path_to_file):
-                            break
 
                         params = {
                             "num_ants": [ants],
@@ -191,7 +189,7 @@ def plotNeigh(ants, sticks):
     num_gens = 1000
     seed = 30
 
-    path = "./SC-PickingObjects/results/"
+    path = "results/"
 
     min = stick_min[0]
     max = stick_max[0]
@@ -472,12 +470,20 @@ if __name__ == "__main__":
         pass
 
 
-    ant = n_ants[1]
-    sticks = n_sticks[-1]
+    ant = 50
+    sticks = 250
 
-    #plotNeigh(ant, sticks)
-    #plotStickMin(ant, sticks)
-    #plotStickMax(ant, sticks)
+    plotNeigh(1, sticks)
+    plotNeigh(50, sticks)
+
+    plotStickMin(1, sticks)
+    plotStickMin(ant, sticks)
+
+    plotStickMax(1, sticks)
+    plotStickMax(10, 200)
+    plotStickMax(10, 250)
+    plotStickMax(50, 200)
+    plotStickMax(50, 250)
     
     
     heatmap_Average()

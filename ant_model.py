@@ -71,7 +71,7 @@ class AntAgent(Agent):
         sticks = [agent for agent in cellmates if agent.name == "Stick"]
         free_sticks = [stick for stick in sticks if stick.ant == None]
 
-        if len(free_sticks) >= self.stick_min and len(free_sticks) <= self.stick_max:
+        if len(free_sticks) >= self.stick_min and len(free_sticks) < self.stick_max:
             #print(f"Found Stick Pile. Dropping {self.stick.unique_id} in {self.pos}")
             self.stick.ant = None
             self.stick = None

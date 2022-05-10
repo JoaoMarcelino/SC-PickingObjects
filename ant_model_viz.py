@@ -46,18 +46,16 @@ def agent_portrayal(agent):
                     "Filled": "true",
                     "w": 0.5,
                     "h":0.5,
-                    "Layer": 10}
-        if agent.stick == None:
-            portrayal["Color"] = "red"
-        else:
-            portrayal["Color"] = "grey"
+                    "Layer": 10,
+                    "Color": "red"}
+
 
     elif agent.name == "Stick":
         portrayal = {"Shape": "circle",
             "Filled": "true",
             "r": 0.1,
             "Layer": 1,
-            "Color": "blue"
+            "Color": agent.color
             }
 
     return portrayal
@@ -74,8 +72,9 @@ if __name__ == "__main__":
 
     grid = CanvasGrid_Altered(agent_portrayal, width, height)
 
-    chart = ChartModule([{"Label": "Average",
-                        "Color": "Black"}],
+    chart = ChartModule([
+                        {"Label": "AverageTotal","Color": "Black"}, 
+                        {"Label": "AverageByColor","Color": "Blue"}],
                         data_collector_name='datacollector')
     
     chart2 = ChartModule([{"Label": "Median",
@@ -85,7 +84,7 @@ if __name__ == "__main__":
     server = ModularServer(AntModel,
                         [grid, chart, chart2],
                         "Ant Model",
-                        {"num_ants":50, "num_sticks":250, "neighType":'VN', "stick_min": 1, "stick_max": 5, "width":width, "height":height})  
+                        {"num_ants":20, "num_sticks":250, "neighType":'VN', "stick_min": 1, "stick_max": 0, "stick_colors":("blue", "green"), "stick_colors_prob": (0.9, 0.1), "width":width, "height":height})  
                         
     server.port = 8522 # The default
     server.launch()

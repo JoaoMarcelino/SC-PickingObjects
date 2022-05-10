@@ -15,21 +15,50 @@ def average_stick_pile(model):
     stick_piles = [agent.num_cellmates for agent in model.schedule.agents]
     N = model.num_sticks
     return sum(stick_piles) / N
+    
+def average_stick_pile_color(model):
+    stick_piles = [agent for agent in model.schedule.agents]
+
+    averages = []
+    for color in model.stick_colors:
+        colored_sticks = [agent.num_cellmates for agent in stick_piles if agent.color == color]
+        N = len(colored_sticks)
+
+        if (N):
+            average = sum(colored_sticks)/ N
+        else:
+            average= 0
+        averages.append(average)
+    return averages
 
 def median_stick_pile(model):
     stick_piles = [agent.num_cellmates for agent in model.schedule.agents]
 
     return statistics.median(stick_piles)
 
+def median_stick_pile_color(model):
+    stick_piles = [agent for agent in model.schedule.agents]
+
+    medians = [9]
+    for color in model.stick_colors:
+        colored_sticks = [agent.num_cellmates for agent in stick_piles if agent.color == color]
+        
+        if colored_sticks:
+            median = statistics.median(colored_sticks)
+        else:
+            median = 0.0
+        medians.append(median)
+    return medians
 
 
 class StickAgent(Agent):
     """An still agent that only moves when picked up."""
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, color):
         super().__init__(unique_id, model)
         self.name = "Stick"
         self.ant = None
         self.num_cellmates = 0
+        self.color = color
 
     #CHANGES 
     def step(self):
@@ -37,6 +66,7 @@ class StickAgent(Agent):
         sticks = [agent for agent in cellmates if agent.name == "Stick"]
 
         self.num_cellmates = len(sticks)
+    
 
 
 class AntAgent(Agent):
@@ -70,8 +100,9 @@ class AntAgent(Agent):
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         sticks = [agent for agent in cellmates if agent.name == "Stick"]
         free_sticks = [stick for stick in sticks if stick.ant == None]
+        colored_sticks = [agent for agent in free_sticks if agent.color == self.stick.color]
 
-        if len(free_sticks) >= self.stick_min and len(free_sticks) < self.stick_max:
+        if len(colored_sticks) >= self.stick_min and len(colored_sticks) < self.stick_max:
             #print(f"Found Stick Pile. Dropping {self.stick.unique_id} in {self.pos}")
             self.stick.ant = None
             self.stick = None
@@ -138,23 +169,35 @@ class AntAgent(Agent):
 class AntModel(Model):
     """A model with 2 type of agents."""
 
-    def __init__(self, num_ants, num_sticks, neighType, stick_min, stick_max,  width, height):
+    def __init__(self, num_ants, num_sticks, neighType, stick_min = 1, stick_max= 0, stick_colors = ['Blue'], stick_colors_prob = [1], width=10, height = 10):
+        
+        self.running = True
 
         if stick_max == 0:
             stick_max = math.inf
+
+        if stick_colors_prob == 1 or len(stick_colors)== 1:
+            stick_colors_prob = [1]
+
+        if sum(stick_colors_prob) != 1:
+            val = 1/len(stick_colors)
+            stick_colors_prob = [val for color in stick_colors]
+        
 
         self.num_ants = num_ants
         self.num_sticks = num_sticks
         self.neighType = neighType
         self.stick_min = stick_min
         self.stick_max = stick_max
+        self.stick_colors = stick_colors
+        self.stick_colors_prob = stick_colors_prob
 
         self.grid = MultiGrid(width, height, True)
 
         self.schedule_ants = RandomActivation(self)
         self.schedule = RandomActivation(self)
 
-        self.running = True
+
 
         # Create ants
         for i in range(self.num_ants):
@@ -167,21 +210,40 @@ class AntModel(Model):
             self.grid.place_agent(ant, (x, y))
 
             self.datacollector = DataCollector(
-                model_reporters={"Average": average_stick_pile, "Median": median_stick_pile}, agent_reporters={"Sticks": 'num_cellmates'}
+                model_reporters={"AverageTotal": average_stick_pile, "AverageByColor": average_stick_pile_color, "MedianTotal": median_stick_pile, "MedianByColor": median_stick_pile_color,}, agent_reporters={"Sticks": 'num_cellmates'}
             )
         
         # Create sticks
-        for i in range(self.num_sticks):
-            stick = StickAgent(i, self)
 
-            #CHANGES
-            self.schedule.add(stick)
+        for j in range(self.num_sticks):
+            prob = self.random.uniform(0, 1)
+            joined_prob = 0
+            for i, color_prob in enumerate(self.stick_colors_prob):
+                joined_prob += color_prob
+
+                if prob <= joined_prob:
+                    color = stick_colors[i]
+                    break
+
+            stick = StickAgent(i*num_sticks + j, self, color)
             
             # Add the agent to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
+            foundStop = False
+            while (not foundStop):
+                x = self.random.randrange(self.grid.width)
+                y = self.random.randrange(self.grid.height)
+
+                cellmates = self.grid.get_cell_list_contents([(x,y)])
+                sticks = [agent for agent in cellmates if agent.name == "Stick"]
+                colored_sticks = [agent for agent in sticks if agent.color != color]
+
+                if not colored_sticks:
+                    #print(stick.color)
+                    foundStop = True
 
             self.grid.place_agent(stick, (x, y))
+            #CHANGES
+            self.schedule.add(stick)
 
     def step(self):
         """Advance the model by one step."""

@@ -225,7 +225,7 @@ class AntModel(Model):
                     color = stick_colors[i]
                     break
 
-            stick = StickAgent(i*num_sticks + j, self, color)
+            stick = StickAgent(j, self, color)
             
             # Add the agent to a random grid cell
             foundStop = False

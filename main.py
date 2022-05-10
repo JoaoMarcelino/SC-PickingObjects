@@ -443,6 +443,7 @@ def plotStickMax(ants, sticks):
         axs.legend(loc="upper right")
 
 
+
     plt.show()
 
 def heatmap_Average():
@@ -709,16 +710,76 @@ def plotMultipleSticks():
     path = "./results/colors/"
 
 
-    fig, axs = plt.subplots(1, 1, sharey=True, sharex=True)
-    fig.suptitle(f"Alteração de StickMax para {ants} ants e {sticks} sticks")
-
-    plt.xlabel("Number of Generations")
-    plt.ylabel("Average of Sticks")
-
     for i, colors in enumerate(colors_array):
+
+        fig, axs = plt.subplots(1, 1, sharey=True, sharex=True)
+        fig.suptitle(f"Multiple Populations {i + 1}")
+
+        plt.xlabel("Number of Generations")
+        plt.ylabel("Average of Sticks")
 
 
         total = f"batch_{i+ 1}.csv"
+        path_to_file = path + total
+
+        df = readfile(path + total)
+
+        step0 = (df.Step== 0) & (df.iteration == 0)
+        agentId = (df.AgentID == 0) & (df.iteration == 0)
+
+        steps =  df[(step0) | (agentId)].Step.values
+        print(steps)
+        averageTotal = df[(step0) | (agentId)].AverageTotal.values
+
+        averages = df[(step0) | (agentId)].AverageByColor.values
+        averages = strToInt(averages)
+
+
+        for j in range(1, seed):
+
+            step0 = (df.Step== 0) & (df.iteration == j)
+            agentId = (df.AgentID == 0) & (df.iteration == j)
+
+            df_averageTotal =  df[step0 | agentId].AverageTotal.values
+
+            df_averages = df[step0 | agentId].AverageByColor.values
+            df_averages = strToInt(df_averages)
+
+
+            averageTotal = np.sum([averageTotal, df_averageTotal], axis=0)
+            averages = np.sum([averages, df_averages], axis = 0)
+        #print(averages)
+        averageTotal = averageTotal/seed
+        averages = averages/seed
+
+        #print(steps, averageTotal)
+        axs.plot(steps, averageTotal,  label='Total', color='Black')
+
+        #print(averages.shape)
+        for k in range(averages.shape[1]):
+            print(steps.shape, np.transpose(averages[:,k]).shape, np.transpose(averages[:,k]))
+            axs.plot(steps,  np.transpose(averages[:,k]),  label=f'{colors[k]}', color = colors[k])
+            pass
+
+        axs.legend(loc="upper right")
+
+        plt.show()
+
+
+    path = "./results/probability/"
+    colors = colors_array[1]
+    probability = [(0.5, 0.5), (0.67, 0.33), (0.75, 0.25), (0.8, 0.2)]
+
+    for i, prob in enumerate(probability):
+
+        fig, axs = plt.subplots(1, 1, sharey=True, sharex=True)
+        fig.suptitle(f"Double Populations with {prob}")
+
+        plt.xlabel("Number of Generations")
+        plt.ylabel("Average of Sticks")
+
+
+        total = f"batch_{i}.csv"
         path_to_file = path + total
 
         df = readfile(path + total)
@@ -746,24 +807,21 @@ def plotMultipleSticks():
 
             averageTotal = np.sum([averageTotal, df_averageTotal], axis=0)
             averages = np.sum([averages, df_averages], axis = 0)
-        #print(averages)
+
         averageTotal = averageTotal/seed
         averages = averages/seed
 
         axs.plot(steps, averageTotal,  label='Total', color='Black')
-        print(averages.shape)
-        for i in range(averages.shape[1]):
-            print(steps.shape, np.transpose(averages)[i].shape)
-            axs.plot(steps,  np.transpose(averages)[i],  label=f'{colors[i]}', color = colors[i])
-        
+
+        #print(averages.shape)
+        for k in range(averages.shape[1]):
+            print(steps.shape, np.transpose(averages[:,k]).shape, np.transpose(averages[:,k]))
+            axs.plot(steps,  np.transpose(averages[:,k]),  label=f'{colors[k]}', color = colors[k])
+            pass
+
         axs.legend(loc="upper right")
 
-
-    plt.show()
-
-
-    path = "./results/probability/"
-    probability = [(0.5, 0.5), (0.67, 0.33), (0.75, 0.25), (0.8, 0.2)]
+        plt.show()
 
 
 

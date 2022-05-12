@@ -443,7 +443,6 @@ def plotStickMax(ants, sticks):
         axs.legend(loc="upper right")
 
 
-
     plt.show()
 
 def heatmap_Average():
@@ -823,7 +822,43 @@ def plotMultipleSticks():
 
         plt.show()
 
+def pilePlot():
+    colors_array = [["Blue"], ["Blue", "Green"] , ["Blue", "Green", "Yellow"]]
+    prob = [(0.5, 0.5), (0.34, 0.33, 0.33)]
+    path = "./results/colors/"
+    seed = 30
 
+    for i, colors in enumerate(colors_array):
+        fig, axs = plt.subplots(1, 1, sharey=True, sharex=True)
+        fig.suptitle(f"Número de pilhas por cor")
+        plt.xlabel("Number of Generations")
+        plt.ylabel("Average of Piles")
+        total = f"batch_{i+ 1}.csv"
+        path_to_file = path + total
+        df = readfile(path_to_file)
+        step0 = (df.Step== 0) & (df.iteration == 0)
+        agentId = (df.AgentID == 0) & (df.iteration == 0)
+        steps =  df[(step0) | (agentId)].Step.values
+        pilesc = df[step0 | agentId].PilesPerColor.values
+        pilesc = strToInt(pilesc)
+        piles = df[step0 | agentId].Piles.values
+        for j in range(1, seed):
+            step0 = (df.Step== 0) & (df.iteration == j)
+            agentId = (df.AgentID == 0) & (df.iteration == j)
+            df_pilesc = df[step0 | agentId].PilesPerColor.values
+            df_pilesc = strToInt(df_pilesc)
+            df_piles = df[step0 | agentId].Piles.values
+            pilesc = np.sum([pilesc, df_pilesc], axis=0)
+            piles = np.sum([piles, df_piles], axis = 0)
+        pilesc = pilesc/seed
+        piles = piles/seed
+        axs.plot(steps, piles,  label='Total', color='Black')
+        for k in range(pilesc.shape[1]):
+            print(steps.shape, np.transpose(pilesc[:,k]).shape, np.transpose(pilesc[:,k]))
+            axs.plot(steps,  np.transpose(pilesc[:,k]),  label=f'{colors[k]}', color = colors[k])
+            pass
+        axs.legend(loc="upper right")
+        plt.show()     
 
 def strToInt(array):
     final = []
@@ -869,4 +904,6 @@ if __name__ == "__main__":
     #heatmap_Median_MinMax()
 
     #main2()
-    plotMultipleSticks()
+    #plotMultipleSticks()
+    pilePlot()
+

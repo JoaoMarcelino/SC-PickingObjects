@@ -77,14 +77,19 @@ if __name__ == "__main__":
                         {"Label": "AverageByColor","Color": "Blue"}],
                         data_collector_name='datacollector')
     
-    chart2 = ChartModule([{"Label": "Median",
+    chart2 = ChartModule([{"Label": "MedianTotal",
                         "Color": "Black"}],
                         data_collector_name='datacollector')
 
+    chart3 = ChartModule([{"Label": "Piles",
+                        "Color": "Black"}],
+                        data_collector_name='datacollector')
+
+
     server = ModularServer(AntModel,
-                        [grid, chart, chart2],
+                        [grid, chart, chart2,chart3],
                         "Ant Model",
-                        {"num_ants":20, "num_sticks":250, "neighType":'VN', "stick_min": 1, "stick_max": 0, "stick_colors":("blue", "green"), "stick_colors_prob": (0.9, 0.1), "width":width, "height":height})  
+                        {"num_ants":1, "num_sticks":10, "neighType":'VN', "stick_min": 1, "stick_max": 0, "stick_colors":("blue", "green","yellow"), "stick_colors_prob": (0.34, 0.33,0.33), "width":width, "height":height})  
                         
-    server.port = 8522 # The default
+    server.port = 8522 # The default"
     server.launch()

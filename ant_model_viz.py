@@ -44,8 +44,8 @@ def agent_portrayal(agent):
     if agent.name == "Ant":
         portrayal = {"Shape": "rect",
                     "Filled": "true",
-                    "w": 0.5,
-                    "h":0.5,
+                    "w": 0.2,
+                    "h":0.2,
                     "Layer": 10,
                     "Color": "red"}
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     chart = ChartModule([
                         {"Label": "AverageTotal","Color": "Black"}, 
-                        {"Label": "AverageByColor","Color": "Blue"}],
+                       ],
                         data_collector_name='datacollector')
     
     chart2 = ChartModule([{"Label": "MedianTotal",
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     server = ModularServer(AntModel,
                         [grid, chart, chart2,chart3],
                         "Ant Model",
-                        {"num_ants":1, "num_sticks":10, "neighType":'VN', "stick_min": 1, "stick_max": 0, "stick_colors":("blue", "green","yellow"), "stick_colors_prob": (0.34, 0.33,0.33), "width":width, "height":height})  
+                        {"num_ants":5, "num_sticks":15, "neighType":'VN', "stick_min": 1, "stick_max": 0, "width":width, "height":height})  
                         
     server.port = 8522 # The default"
     server.launch()

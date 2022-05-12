@@ -188,7 +188,7 @@ class AntAgent(Agent):
 class AntModel(Model):
     """A model with 2 type of agents."""
 
-    def __init__(self, num_ants, num_sticks, neighType, stick_min = 1, stick_max= 0, stick_colors = ['Blue'], stick_colors_prob = [1], width=10, height = 10):
+    def __init__(self, num_ants, num_sticks, neighType, stick_min = 1, stick_max= 0, stick_colors = ['Blue'], stick_colors_prob = [1], width=5, height = 5):
         
         self.running = True
 

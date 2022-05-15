@@ -1,6 +1,3 @@
-from asyncio.windows_events import NULL
-from asyncore import read
-from turtle import width
 from ant_model import AntModel, average_stick_pile
 import random
 import os
@@ -846,8 +843,8 @@ if __name__ == "__main__":
         pass
 
 
-    ant = 50
-    sticks = 250
+    #ant = 50
+    #sticks = 250
 
     #plotNeigh(1, sticks)
     #plotNeigh(50, sticks)
@@ -856,9 +853,9 @@ if __name__ == "__main__":
     #plotStickMin(ant, sticks)
 
     #plotStickMax(1, sticks)
-    #plotStickMax(30, 200)
-    #plotStickMax(20, 250)
-    #plotStickMax(50, 200)
+    ##plotStickMax(30, 200)
+    ##plotStickMax(20, 250)
+    ##plotStickMax(50, 200)
     #plotStickMax(50, 250)
     
     
@@ -869,4 +866,4 @@ if __name__ == "__main__":
     #heatmap_Median_MinMax()
 
     #main2()
-    plotMultipleSticks()
+    #plotMultipleSticks()

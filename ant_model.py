@@ -39,7 +39,7 @@ def median_stick_pile(model):
 def median_stick_pile_color(model):
     stick_piles = [agent for agent in model.schedule.agents]
 
-    medians = [9]
+    medians = []
     for color in model.stick_colors:
         colored_sticks = [agent.num_cellmates for agent in stick_piles if agent.color == color]
         
@@ -49,6 +49,26 @@ def median_stick_pile_color(model):
             median = 0.0
         medians.append(median)
     return medians
+
+def piles_per_color(model):
+    c_piles = []
+    for color in model.stick_colors:
+        colored_sticks = [agent.num_cellmates for agent in model.schedule.agents if agent.color == color]
+        c_pile = 0
+        for c in set(colored_sticks):
+                c_pile =c_pile + round(colored_sticks.count(c)/c)
+        c_piles.append(c_pile)        
+    return c_piles
+
+def piles (model):
+    c_piles = []
+    for color in model.stick_colors:
+        colored_sticks = [agent.num_cellmates for agent in model.schedule.agents if agent.color == color]
+        c_pile = 0
+        for c in set(colored_sticks):
+                c_pile =c_pile + round(colored_sticks.count(c)/c)
+        c_piles.append(c_pile)        
+    return sum(c_piles)
 
 
 class StickAgent(Agent):
@@ -64,7 +84,6 @@ class StickAgent(Agent):
     def step(self):
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         sticks = [agent for agent in cellmates if agent.name == "Stick"]
-
         self.num_cellmates = len(sticks)
     
 
@@ -169,7 +188,7 @@ class AntAgent(Agent):
 class AntModel(Model):
     """A model with 2 type of agents."""
 
-    def __init__(self, num_ants, num_sticks, neighType, stick_min = 1, stick_max= 0, stick_colors = ['Blue'], stick_colors_prob = [1], width=10, height = 10):
+    def __init__(self, num_ants, num_sticks, neighType, stick_min = 1, stick_max= 0, stick_colors = ['Blue'], stick_colors_prob = [1], width=5, height = 5):
         
         self.running = True
 
@@ -210,7 +229,7 @@ class AntModel(Model):
             self.grid.place_agent(ant, (x, y))
 
             self.datacollector = DataCollector(
-                model_reporters={"AverageTotal": average_stick_pile, "AverageByColor": average_stick_pile_color, "MedianTotal": median_stick_pile, "MedianByColor": median_stick_pile_color,}, agent_reporters={"Sticks": 'num_cellmates'}
+                model_reporters={"AverageTotal": average_stick_pile, "AverageByColor": average_stick_pile_color, "MedianTotal": median_stick_pile, "MedianByColor": median_stick_pile_color,"PilesPerColor": piles_per_color,"Piles":piles}, agent_reporters={"Sticks": 'num_cellmates'}
             )
         
         # Create sticks

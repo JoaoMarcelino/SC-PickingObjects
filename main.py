@@ -73,8 +73,8 @@ def main2():
     num_gens = 1000
     seed = 30
 
-    colors_array = [("Blue", "Green") , ("Blue", "Green", "Yellow")]
-    prob = [(0.5, 0.5), (0.34, 0.33, 0.33)]
+    colors_array = [("Blue", "Green")]# , ("Blue", "Green", "Yellow")
+    prob = [(0.5, 0.5)]#, (0.34, 0.33, 0.33)
     path = "./results/colors/"
 
     total = f"batch_{1}.csv"
@@ -138,8 +138,8 @@ def main2():
         results_df.to_csv(path_to_file)
 
     path = "./results/probability/"
-    probability = [(0.5, 0.5), (0.67, 0.33), (0.75, 0.25), (0.8, 0.2)]
-    colors = ('blue', 'green')
+    probability = [(0.5, 0.5), (0.67, 0.33), (0.75, 0.25), (0.8, 0.2)]#,(0.34, 0.33, 0.33),(0.50, 0.25, 0.25),(0.60, 0.30, 0.10)
+    colors = ('blue', 'green')#,"yellow"
     for i, prob in enumerate(probability):
         total = f"batch_{i}.csv"
         path_to_file = path + total
@@ -438,7 +438,6 @@ def plotStickMax(ants, sticks):
 
         axs.plot(steps, average,  label=f'{max}')
         axs.legend(loc="upper right")
-
 
 
     plt.show()
@@ -820,8 +819,78 @@ def plotMultipleSticks():
 
         plt.show()
 
+def pilePlot():
+    colors_array = [["Blue"], ["Blue", "Green"] , ["Blue", "Green", "Yellow"]]
+    prob = [(0.5, 0.5), (0.34, 0.33, 0.33)]
+    path = "./results/colors/"
+    seed = 30
 
+    for i, colors in enumerate(colors_array):
+        fig, axs = plt.subplots(1, 1, sharey=True, sharex=True)
+        fig.suptitle(f"Number of piles per color")
+        plt.xlabel("Number of Generations")
+        plt.ylabel("Average of Piles")
+        total = f"batch_{i+ 1}.csv"
+        path_to_file = path + total
+        df = readfile(path_to_file)
+        step0 = (df.Step== 0) & (df.iteration == 0)
+        agentId = (df.AgentID == 0) & (df.iteration == 0)
+        steps =  df[(step0) | (agentId)].Step.values
+        pilesc = df[step0 | agentId].PilesPerColor.values
+        pilesc = strToInt(pilesc)
+        piles = df[step0 | agentId].Piles.values
+        for j in range(1, seed):
+            step0 = (df.Step== 0) & (df.iteration == j)
+            agentId = (df.AgentID == 0) & (df.iteration == j)
+            df_pilesc = df[step0 | agentId].PilesPerColor.values
+            df_pilesc = strToInt(df_pilesc)
+            df_piles = df[step0 | agentId].Piles.values
+            pilesc = np.sum([pilesc, df_pilesc], axis=0)
+            piles = np.sum([piles, df_piles], axis = 0)
+        pilesc = pilesc/seed
+        piles = piles/seed
+        axs.plot(steps, piles,  label='Total', color='Black')
+        for k in range(pilesc.shape[1]):
+            print(steps.shape, np.transpose(pilesc[:,k]).shape, np.transpose(pilesc[:,k]))
+            axs.plot(steps,  np.transpose(pilesc[:,k]),  label=f'{colors[k]}', color = colors[k])
+            pass
+        axs.legend(loc="upper right")
+        plt.show()     
+    path = "./results/probability/"
+    colors = colors_array[1]
+    probability = [(0.5, 0.5) , (0.67, 0.33), (0.75, 0.25), (0.8, 0.2)]
 
+    for i, prob in enumerate(probability):
+        fig, axs = plt.subplots(1, 1, sharey=True, sharex=True)
+        fig.suptitle(f"Double Populations with {prob}")
+        plt.xlabel("Number of Generations")
+        plt.ylabel("Average of Piles")
+        total = f"batch_{i}.csv"
+        path_to_file = path + total
+        df = readfile(path_to_file)
+        step0 = (df.Step== 0) & (df.iteration == 0)
+        agentId = (df.AgentID == 0) & (df.iteration == 0)
+        steps =  df[(step0) | (agentId)].Step.values
+        pilesc = df[step0 | agentId].PilesPerColor.values
+        pilesc = strToInt(pilesc)
+        piles = df[step0 | agentId].Piles.values
+        for j in range(1, seed):
+            step0 = (df.Step== 0) & (df.iteration == j)
+            agentId = (df.AgentID == 0) & (df.iteration == j)
+            df_pilesc = df[step0 | agentId].PilesPerColor.values
+            df_pilesc = strToInt(df_pilesc)
+            df_piles = df[step0 | agentId].Piles.values
+            pilesc = np.sum([pilesc, df_pilesc], axis=0)
+            piles = np.sum([piles, df_piles], axis = 0)
+        pilesc = pilesc/seed
+        piles = piles/seed
+        axs.plot(steps, piles,  label='Total', color='Black')
+        for k in range(pilesc.shape[1]):
+            print(steps.shape, np.transpose(pilesc[:,k]).shape, np.transpose(pilesc[:,k]))
+            axs.plot(steps,  np.transpose(pilesc[:,k]),  label=f'{colors[k]},{prob[k]}', color = colors[k])
+            pass
+        axs.legend(loc="upper right")
+        plt.show()   
 def strToInt(array):
     final = []
     for elem in array:
@@ -865,5 +934,7 @@ if __name__ == "__main__":
     #heatmap_Average_MinMax()
     #heatmap_Median_MinMax()
 
-    #main2()
+    main2()
     #plotMultipleSticks()
+    pilePlot()
+
